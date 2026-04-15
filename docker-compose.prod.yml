@@ -1,0 +1,36 @@
+# docker-compose.prod.yml — 正式機覆蓋設定
+# 啟動：docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# 覆蓋原則：只列出「與開發環境不同」的部分
+
+version: '3.9'
+
+services:
+  postgres:
+    ports: []               # 生產環境不對外開放 DB port
+
+  redis:
+    ports: []               # 生產環境不對外開放 Redis port
+
+  minio:
+    ports:
+      - '9000:9000'         # API 仍需開放（Nginx 反代）
+      # 9001 console 生產環境不對外暴露
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile     # 正式機用 JVM 最佳化版本
+    volumes: []             # 正式機不掛載 source code
+    ports:
+      - '8080:8080'         # 只有 Nginx 內部存取，不需要對外
+
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - ./nginx/nginx.prod.conf:/etc/nginx/nginx.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro    # Let's Encrypt SSL 憑證
+      - ./frontend/dist/frozen-food-shop/browser:/usr/share/nginx/html:ro   # Angular build output
+    ports:
+      - '80:80'
+      - '443:443'

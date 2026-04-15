@@ -1,0 +1,19 @@
+# Dockerfile.dev — 本機開發用（JVM 模式，支援快速重啟）
+FROM maven:3.9-eclipse-temurin-17 AS builder
+WORKDIR /work
+COPY pom.xml .
+# 先下載 dependencies（利用 Docker layer cache）
+RUN mvn dependency:go-offline -q
+COPY src ./src
+RUN mvn package -DskipTests -q
+
+FROM eclipse-temurin:17-jre-alpine
+WORKDIR /app
+COPY --from=builder /work/target/quarkus-app/lib/ ./lib/
+COPY --from=builder /work/target/quarkus-app/*.jar ./
+COPY --from=builder /work/target/quarkus-app/app/ ./app/
+COPY --from=builder /work/target/quarkus-app/quarkus/ ./quarkus/
+EXPOSE 8080 5005
+CMD ["java", \
+     "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005", \
+     "-jar", "quarkus-run.jar"]

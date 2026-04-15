@@ -1,0 +1,55 @@
+# ===== 環境變數（絕對不能 commit！）=====
+.env
+*.env.local
+
+# ===== Node / Angular =====
+node_modules/
+dist/
+.angular/
+*.js.map
+
+# ===== Java / Quarkus / Maven =====
+target/
+*.class
+*.jar
+*.war
+.quarkus/
+*.iml
+.mvn/wrapper/maven-wrapper.jar
+
+# ===== IDE =====
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# ===== Docker =====
+# docker-compose.override.yml  ← 如果有本地覆蓋設定
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== Logs =====
+*.log
+logs/
+
+# ===== MinIO / PostgreSQL local data =====
+postgres_data/
+redis_data/
+minio_data/
+
+# ===== Word 暫存檔 =====
+~$*
+
+# ===== 本地筆記與文件（不推上 GitHub）=====
+docs/
+
+# ===== Claude / Cowork 設定（工具設定，非專案內容）=====
+.claude/
+
+# ===== vscode 設定檔 =====
+.vscode/
