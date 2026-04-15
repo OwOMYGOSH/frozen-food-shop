@@ -61,7 +61,7 @@ jobs:
         # 必須透過 Angular CLI 執行 ng test，才能正確初始化 Vitest 環境
         # （Angular builder 負責注入 describe/it/expect globals 與 Angular 編譯器）
         # --watch=false = 跑一次就結束，不進入 watch 模式
-        run: cd frontend && ng test --watch=false
+        run: cd frontend && npx ng test --watch=false
 
   # ---- Job 3：部署（只有 push main 才執行）----
   deploy:
