@@ -48,8 +48,12 @@ minio_data/
 # ===== 本地筆記與文件（不推上 GitHub）=====
 docs/
 
+# ===== JWT 金鑰（不能進 git！）=====
+*.pem
+
 # ===== Claude / Cowork 設定（工具設定，非專案內容）=====
 .claude/
+.auto-memory/
 
 # ===== vscode 設定檔 =====
 .vscode/
