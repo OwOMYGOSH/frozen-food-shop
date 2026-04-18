@@ -48,8 +48,10 @@ minio_data/
 # ===== 本地筆記與文件（不推上 GitHub）=====
 docs/
 
-# ===== JWT 金鑰（不能進 git！）=====
-*.pem
+# ===== JWT 金鑰（production 用的不能進 git！）=====
+# src/test/resources/ 下的測試金鑰可以推（非 production 用途）
+backend/src/main/resources/privateKey.pem
+backend/src/main/resources/publicKey.pem
 
 # ===== Claude / Cowork 設定（工具設定，非專案內容）=====
 .claude/
