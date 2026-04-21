@@ -54,7 +54,7 @@ public class AuthService {
     @jakarta.annotation.PostConstruct
     void init() {
         this.valueCommands = redisDataSource.value(String.class);
-        this.keyCommands    = redisDataSource.key(String.class);
+        this.keyCommands = redisDataSource.key(String.class);
     }
 
     // ── Register ──────────────────────────────────────────────────────────

@@ -14,7 +14,7 @@ import java.util.List;
  * 商品分類 REST 端點
  *
  * GET /api/categories        → 公開，任何人都可以查詢分類
- * POST/PUT/DELETE             → 需要 ADMIN 角色
+ * POST/PUT/DELETE            → 需要 ADMIN 角色
  */
 @Path("/api/categories")
 @Produces(MediaType.APPLICATION_JSON)
