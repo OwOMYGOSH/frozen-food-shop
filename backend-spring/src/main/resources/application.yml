@@ -1,0 +1,119 @@
+# ============================================================
+#  application.yml — Spring Boot 設定
+#
+#  Profile 策略（對應 Quarkus 原本的設計）：
+#  - dev   : 本地開發，連本機的 docker-compose 起的 DB/Redis
+#  - test  : 測試，靠 Testcontainers 動態起容器（等同 Quarkus Dev Services）
+#  - prod  : 正式環境，全部從環境變數讀
+# ============================================================
+
+spring:
+  application:
+    name: frozen-food-shop-backend
+
+  profiles:
+    active: dev
+
+  datasource:
+    # 預設值給 dev / prod 覆蓋；test profile 由 Testcontainers 動態注入
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/frozenshop}
+    username: ${SPRING_DATASOURCE_USERNAME:frozen}
+    password: ${SPRING_DATASOURCE_PASSWORD:frozen123}
+    hikari:
+      maximum-pool-size: 16
+
+  jpa:
+    hibernate:
+      # 一律不讓 Hibernate 自動建表，schema 由 Flyway 管
+      ddl-auto: none
+    properties:
+      hibernate:
+        # Spring Boot 3 + Hibernate 6 自動偵測 dialect，不用指定
+        format_sql: true
+    open-in-view: false   # 關掉 OSIV，避免 N+1 問題被藏起來
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+  data:
+    redis:
+      host: ${SPRING_REDIS_HOST:localhost}
+      port: ${SPRING_REDIS_PORT:6379}
+      password: ${SPRING_REDIS_PASSWORD:}
+
+  # Spring Security + OAuth2 Resource Server：
+  # 告訴 Spring 用這把 public key 驗 JWT 簽章
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          public-key-location: classpath:publicKey.pem
+
+server:
+  port: 8080
+
+# 自訂 JWT 設定（我們自己簽 JWT，不是靠外部 Auth Provider）
+app:
+  jwt:
+    issuer: frozen-food-shop
+    # access token 有效秒數，預設 1 小時
+    access-token-lifespan-seconds: ${JWT_EXPIRY_SECONDS:3600}
+    private-key-location: classpath:privateKey.pem
+    public-key-location: classpath:publicKey.pem
+  refresh-token:
+    # refresh token 有效秒數，預設 7 天
+    lifespan-seconds: ${JWT_REFRESH_EXPIRY_SECONDS:604800}
+
+minio:
+  url: ${MINIO_URL:http://localhost:9000}
+  access-key: ${MINIO_ACCESS_KEY:minioadmin}
+  secret-key: ${MINIO_SECRET_KEY:minioadmin123}
+  bucket: ${MINIO_BUCKET:frozen-food-images}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: never
+
+logging:
+  level:
+    org.springframework.security: INFO
+    org.hibernate.SQL: DEBUG
+
+---
+# ── prod profile ──
+spring:
+  config:
+    activate:
+      on-profile: prod
+  jpa:
+    properties:
+      hibernate:
+        format_sql: false
+logging:
+  level:
+    org.hibernate.SQL: WARN
+
+---
+# ── test profile（單元 / 整合測試用） ──
+spring:
+  config:
+    activate:
+      on-profile: test
+  # 測試用 key 路徑指向 test/resources/
+  # （實際的 datasource.url 由 @DynamicPropertySource 在測試 base class 裡注入）
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          public-key-location: classpath:publicKey.pem
+app:
+  jwt:
+    private-key-location: classpath:privateKey.pem
+    public-key-location: classpath:publicKey.pem

@@ -52,6 +52,8 @@ docs/
 # src/test/resources/ 下的測試金鑰可以推（非 production 用途）
 backend/src/main/resources/privateKey.pem
 backend/src/main/resources/publicKey.pem
+backend-spring/src/main/resources/privateKey.pem
+backend-spring/src/main/resources/publicKey.pem
 
 # ===== Claude / Cowork 設定（工具設定，非專案內容）=====
 .claude/
